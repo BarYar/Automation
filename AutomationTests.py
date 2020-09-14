@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-from Log import Log
+from AutomationClasses import *
 #Ordering 3 items and then checking if the items exist in the cart.
 class TestAOS(TestCase):
     #setUp
@@ -110,8 +110,8 @@ class TestAOS(TestCase):
     #     for i in enteredProducts:
     #         self.assertTrue(i in cartProducts)
     #         self.assertTrue(enteredProducts[i] == cartProducts[i])
-    #q10
-    def test1(self):
+    #q10-Log in and Log out process
+    def test10(self):
         log=Log(self.driver)
         log.LogInDetails('experis123','Experis123')
         log.LogIn()
