@@ -76,6 +76,38 @@ class MainPage:
         if (categoryname not in categorynames):
             raise ValueError("Invalid category name.")
         self.driver.find_element_by_id(f'{categoryname}Img').click()
+    #Get the amount of the products in the cart-top right
+    def cartAmount(self):
+        return self.driver.find_element_by_class_name("cart ng-binding")
+    #get the elements of the cart in the top right
+    def getCartElements(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//li//table[@ng-show='cart.productsInCart.length > 0']"))
+        )
+        return self.driver.find_elements_by_xpath("//li//table[@ng-show='cart.productsInCart.length > 0']//tr")
+    #Get the products details-top right
+    #Returns list-it's length- the amount of the carts
+    #in each cell in the list- the prodcut details order by:
+    #Name[0], Quantity[1], Price[2], Color[3]
+    def getProductDetails(self):
+        elements=self.getCartElements()
+        listOfProducts=[]
+        fob nr i in range(len(elements)):
+            if(i==0):
+                listOfProducts=[[,,,]]
+        for i in range (len(elements)):
+            if(i<(len(elements)-2)):
+                elements[i]=
+            else:
+                break
+#Category page class
+class CategoryPage:
+    #Constructor
+    def __init__(self,driver):
+        self.driver=driver
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CLASS_NAME, "cell categoryRight"))
+        )
 
 
 
