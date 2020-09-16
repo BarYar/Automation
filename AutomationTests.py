@@ -17,6 +17,7 @@ class TestAOS(TestCase):
         self.driver.get("https://www.advantageonlineshopping.com/#/")
         self.driver.maximize_window()
     def tearDown(self):
+        self.driver.find_element_by_class_name("logo").click()
         self.driver.quit()
     # Ordering 2 items with different quantities and then checking if the items exist in the cart.
     # def test2(self):
