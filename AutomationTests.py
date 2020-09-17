@@ -15,11 +15,42 @@ class TestAOS(TestCase):
         path = r"C:\Driver\chromedriver.exe"
         self.driver = webdriver.Chrome(path)
         self.driver.get("https://www.advantageonlineshopping.com/#/")
+        self.lCategory=['speakers','tablets','laptops','mice','headphones']
         self.driver.maximize_window()
+        WebDriverWait(self.driver, 10).until(
+            EC.invisibility_of_element((By.CLASS_NAME, "loader"))
+        )
     def tearDown(self):
         self.driver.find_element_by_class_name("logo").click()
         self.driver.quit()
-    # Ordering 2 items with different quantities and then checking if the items exist in the cart.
+    #q1-Add 2 products-check if it's equal to the amount of products in the top right.
+    def test1(self):
+        mpage=MainPage(self.driver)
+        categorynum=random.randint(0,4)
+        mpage.enterCategoryPage(self.lCategory[categorynum])
+        cpage = categoryPage(self.driver)
+        ListOfLoc=cpage.openRandomProduct()
+        ppage = productPage(self.driver)
+        ppage.addNewProduct(3)
+        cpage.backAndWait()
+        cpage.openRandomProduct(ListOfLoc)
+        ppage.addNewProduct(2)
+        mpage=MainPage(self.driver)
+        assert mpage.cartAmount()==5
+
+
+
+    #q10-Log in and Log out process
+    def test10(self):
+        log=Log(self.driver)
+        log.LogInDetails('experis123','Experis123')
+        log.LogIn()
+        log.LogOut()
+
+
+if __name__=="__main__":
+    unittest.main()
+# Ordering 2 items with different quantities and then checking if the items exist in the cart.
     # def test2(self):
     #     enteredProducts= []
     #     cartProducts= []
@@ -111,13 +142,3 @@ class TestAOS(TestCase):
     #     for i in enteredProducts:
     #         self.assertTrue(i in cartProducts)
     #         self.assertTrue(enteredProducts[i] == cartProducts[i])
-    #q10-Log in and Log out process
-    def test10(self):
-        log=Log(self.driver)
-        log.LogInDetails('experis123','Experis123')
-        log.LogIn()
-        log.LogOut()
-
-
-if __name__=="__main__":
-    unittest.main()
