@@ -23,7 +23,7 @@ class TestAOS(TestCase):
     def tearDown(self):
         self.driver.find_element_by_class_name("logo").click()
         self.driver.quit()
-    #q1-Add 2 products-check if it's equal to the amount of products in the top right.
+    #q1-Add 2 products-check if it's equal to the amount of products in the top right of the screen
     def test1(self):
         mpage=MainPage(self.driver)
         categorynum=random.randint(0,4)
