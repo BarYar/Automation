@@ -1,8 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from unittest import TestCase
-import unittest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -138,13 +135,14 @@ class MainPage:
     def cartClick(self):
         self.driver.find_element_by_id("menuCart").click()
     #Removing products from the cart
-    def cartRemove(self,location=1):
+    def cartRemove(self,location=0):
         listOfProducts=self.getProductDetails()
         self.driver.find_elements_by_xpath("//div[@class='removeProduct iconCss iconX']")[location].click()
         return listOfProducts[location]
     # Returns if product is in cart
     # You must Create the product details list before starting this function
     def isInCart(self,product):
+        self.getProductDetails()
         return (product in self.listOfProducts)
     #"Rotating" the cart list
     def FIFO(self):
@@ -152,8 +150,6 @@ class MainPage:
         for i in range(len(self.listOfProducts)-1,-1,-1):
             newList.append((self.listOfProducts[i]))
         self.listOfProducts=newList
-
-
 #Category page class
 class categoryPage:
     #Constructor
@@ -186,7 +182,7 @@ class productPage:
     def __init__(self,driver):
         self.driver=driver
     # Get the products details-top right
-    # Returns list-it's length- the amount of the carts
+    # Returns list-it's length- the amount of the  products in cart
     # in each cell in the list- the prodcut details order by:
     # Name[0], Quantity[1]=0-Cant Reach, Price[2], Color[3]
     def getProductDetails(self):
@@ -220,6 +216,82 @@ class productPage:
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID, "Description"))
         )
+#Shopping cart page class
+class shoppingCart:
+    #Constructor
+    def __init__(self,driver):
+        self.driver=driver
+    #Returns the the elements in the cart
+    #List of names[0],List of quantity[1],List of price[2],List of color[3]
+    def elements_in_cart(self):
+        elements=[0,0,0,0]
+        table="//table[@class='fixedTableEdgeCompatibility']//tr"
+        elements[0]=self.driver.find_elements_by_xpath(f'{table}//label[@class="roboto-regular productName ng-binding"]')
+        elements[1]=self.driver.find_elements_by_xpath(f'{table}//label[@class="ng-binding"]')
+        elements[2]=self.driver.find_elements_by_xpath(f'{table}//p[@class="price roboto-regular ng-binding"]')
+        elements[3] = self.driver.find_elements_by_xpath(f'{table}//span[@title]')
+        return elements
+    #Return the list of the products in the cart.
+    # Returns list-it's length- the amount of the  products in cart
+    # in each cell in the list- the prodcut details order by:
+    # Name[0], Quantity[1]=0-Cant Reach, Price[2], Color[3]
+    def products_details(self):
+        elements = self.elements_in_cart()
+        print(elements)
+        self.product_list=[]
+        for i in range (0,len(elements[0])):
+            self.product_list.append([0,0,0,0])
+        for i in range (0,len(elements[0])):
+            self.product_list[i][0]=elements[0][i].text
+            self.product_list[i][1] = elements[1][i].text
+            price=elements[2][i].text[1:]
+            if (len(price) == 8):  # Assuming that the most expensive product is max 9,999.99$
+                price = price[:1] + price[2:]
+            self.product_list[i][2] =float(price)
+            self.product_list[i][3] = elements[3][i].get_attribute('title')
+        return self.product_list
+    #Return the check out price
+    def checkOut(self):
+        price=self.driver.find_element_by_xpath("//div[@id='shoppingCart']//span[@class='roboto-medium ng-binding']").text[1:]
+        if(len(price)==8):
+            price=price[:1]+price[2:]
+        price=float(price)
+        return price
+    #Click on the check out button
+    def Cheack_out(self):
+        self.driver.find_element_by_id("checkOutButton").click()
+        WebDriverWait(self.driver,10).until(
+            EC.visibility_of_element_located((By.ID , "orderPayment")))
+    #Waiting until the page is up
+    def implicityWaitCartPage(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//a[contains(text(),'SHOPPING CART')]"))
+        )
+class orderPayment:
+    def __init__(self,driver):
+        self.driver=driver
+        WebDriverWait(self.driver , 10).until(
+            EC.visibility_of_element_located((By.ID , "form")))
+        self.userNameList=[]
+
+    def User_name(self):
+        self.st= 'kobi'
+        num=random.randint(1,10000000)
+        self.st=self.st+str(num)
+        if(self.st in self.userNameList):
+            return self.User_name()
+        else:
+            self.userNameList.append(self.st)
+            return self.st
+
+    def Create_account(self):
+        self.driver.find_element_by_xpath("//div//input[@name='usernameRegisterPage']").click().send_keys(self.User_name())
+        self.driver.find_element_by_xpath('//div//input[@name="emailRegisterPage"]').click().send_keys('abcd@gmail.com')
+        self.driver.find_element_by_xpath('//div//input[@name="passwordRegisterPage"]').click().send_keys('Abcd1234')
+        self.driver.find_element_by_xpath('//div//input[@name="confirm_passwordRegisterPage"]').click().send_keys('Abcd1234')
+        self.driver.find_element_by_xpath('//div//input[@name="i_agree"]').click()
+        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable(By.ID("register_btnundefined")))
+
 
 
 

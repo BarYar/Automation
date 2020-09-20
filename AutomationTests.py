@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 from AutomationClasses import *
-#Ordering 3 items and then checking if the items exist in the cart.
+import logging
 class TestAOS(TestCase):
     #setUp
     def setUp(self):
@@ -49,15 +49,58 @@ class TestAOS(TestCase):
             cpage.openRandomProduct(ListOfLoc)
             productsDetails.append(ppage.addNewProduct(3-i))
             cpage.backAndWait()
-        print(productsDetails)
         self.assertTrue(self.mpage.cartCompare(productsDetails))
+    #q3- Ordering 2 products then remove 1 of them from the cart and check if it's removed from the cart.
+    def test3(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ListOfLoc = []
+        ppage = productPage(self.driver)
+        for i in range(2):
+            cpage.openRandomProduct(ListOfLoc)
+            ppage.addNewProduct(3 - i)
+            cpage.backAndWait()
+        productr=self.mpage.cartRemove()
+        self.assertFalse(self.mpage.isInCart(productr))
+    #q4-Ordering 2 products and then clicking on the shopping cart, check if we entered to the shopping cart
+    def test4(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ListOfLoc = []
+        ppage = productPage(self.driver)
+        for i in range(2):
+            cpage.openRandomProduct(ListOfLoc)
+            ppage.addNewProduct(3 - i)
+            cpage.backAndWait()
+        self.mpage.cartClick()
+        cartp=shoppingCart(self.driver)
+        cartp.implicityWaitCartPage()
+    #q5-Ordering 3 products, check if the total price of the products matches the checkout price.
+    def test5(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ListOfLoc = []
+        productsDetails = []
+        sum=0
+        ppage = productPage(self.driver)
+        for i in range(3):
+            cpage.openRandomProduct(ListOfLoc)
+            productsDetails.append(ppage.addNewProduct(3 - i))
+            sum=sum+productsDetails[i][2]
+            cpage.backAndWait()
+        shoppingc = shoppingCart(self.driver)
+        self.mpage.cartClick()
+        shoppingc.implicityWaitCartPage()
+        checkoutprice=shoppingc.checkOut()
+        sum=round(sum,2)
+        checkoutprice=round(checkoutprice,2)
+        self.assertEqual(checkoutprice,sum)
     #q10-Log in and Log out process
     def test10(self):
         log=Log(self.driver)
         log.LogInDetails('experis123','Experis123')
         log.LogIn()
         log.LogOut()
-
 
 if __name__=="__main__":
     unittest.main()
