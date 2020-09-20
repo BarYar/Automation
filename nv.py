@@ -1,2 +1,2 @@
-st="asdsad adasdsa sdadb"
-print("e" in st)
+string="1234"
+print(string[:1]+string[2:])

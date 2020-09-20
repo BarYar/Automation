@@ -12,7 +12,7 @@ from AutomationClasses import *
 class TestAOS(TestCase):
     #setUp
     def setUp(self):
-        path = r"C:\Driver\chromedriver.exe"
+        path = r"C:\Users\97252\Desktop\Selenium\chromedriver.exe"
         self.driver = webdriver.Chrome(path)
         self.driver.get("https://www.advantageonlineshopping.com/#/")
         self.lCategory=['speakers','tablets','laptops','mice','headphones']
@@ -20,26 +20,37 @@ class TestAOS(TestCase):
         WebDriverWait(self.driver, 10).until(
             EC.invisibility_of_element((By.CLASS_NAME, "loader"))
         )
+        self.mpage = MainPage(self.driver)
+        self.categorynum = random.randint(0, 4)
     def tearDown(self):
         self.driver.find_element_by_class_name("logo").click()
         self.driver.quit()
     #q1-Add 2 products-check if it's equal to the amount of products in the top right of the screen
     def test1(self):
-        mpage=MainPage(self.driver)
-        categorynum=random.randint(0,4)
-        mpage.enterCategoryPage(self.lCategory[categorynum])
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
         cpage = categoryPage(self.driver)
-        ListOfLoc=cpage.openRandomProduct()
+        ListOfLoc=[]
+        cpage.openRandomProduct(ListOfLoc)
         ppage = productPage(self.driver)
         ppage.addNewProduct(3)
         cpage.backAndWait()
         cpage.openRandomProduct(ListOfLoc)
         ppage.addNewProduct(2)
         mpage=MainPage(self.driver)
-        assert mpage.cartAmount()==5
-
-
-
+        self.assertTrue(int(mpage.cartAmount())==5)
+    #q2-Ordering 3 prodcuts,check if their details in the car are right.
+    def test2(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ListOfLoc =[]
+        productsDetails=[]
+        ppage = productPage(self.driver)
+        for i in range(3):
+            cpage.openRandomProduct(ListOfLoc)
+            productsDetails.append(ppage.addNewProduct(3-i))
+            cpage.backAndWait()
+        print(productsDetails)
+        self.assertTrue(self.mpage.cartCompare(productsDetails))
     #q10-Log in and Log out process
     def test10(self):
         log=Log(self.driver)
