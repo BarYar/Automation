@@ -72,10 +72,16 @@ class MainPage:
         if (categoryname not in categorynames):
             raise ValueError("Invalid category name.")
         self.driver.find_element_by_id(f'{categoryname}Img').click()
+    #Implicity wait main page
     def implicityWaitMainPage(self):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID, "our_products"))
         )
+    #Returns to main page and wait for it to load
+    def backAndWait(self):
+        self.driver.back()
+        self.implicityWaitMainPage()
+
 
     """-----------------------------------------------------------------------------------------------------------------
                                         Cart in the top right functions
@@ -176,6 +182,13 @@ class categoryPage:
     def backAndWait(self):
         self.driver.back()
         self.implicityWaitCategoryPage()
+
+    #Check if the category title equals the givem title.
+    def categoryTitleEqual(self,title):
+        self.implicityWaitCategoryPage()
+        categoryname = self.driver.find_element_by_xpath('//h3[@class="categoryTitle roboto-regular sticky ng-binding"]').text
+        return title == categoryname #Return True or False
+
 #Product page class
 class productPage:
     #Constructor
@@ -267,13 +280,31 @@ class shoppingCart:
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//a[contains(text(),'SHOPPING CART')]"))
         )
+#Order Payment pages
 class orderPayment:
+    #Constructor
     def __init__(self,driver):
         self.driver=driver
-        WebDriverWait(self.driver , 10).until(
-            EC.visibility_of_element_located((By.ID , "form")))
+        self.waitRegister()
         self.userNameList=[]
 
+    #Implicity wait- register from shopping cart
+    def waitRegister(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "form")))
+
+    #Implicity wait- after registration
+    def waitAfterRegistration(self):
+        WebDriverWait(self.driver,10).until(
+            EC.visibility_of_element_located((By.ID,"orderPayment"))
+        )
+
+    # Implicity wait- after Payment
+    def waitAfterPayment(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID,"orderPaymentSuccess"))
+        )
+    #Create new random user
     def User_name(self):
         self.st= 'kobi'
         num=random.randint(1,10000000)
@@ -284,6 +315,7 @@ class orderPayment:
             self.userNameList.append(self.st)
             return self.st
 
+    #Create new account
     def Create_account(self):
         self.driver.find_element_by_xpath("//div//input[@name='usernameRegisterPage']").click().send_keys(self.User_name())
         self.driver.find_element_by_xpath('//div//input[@name="emailRegisterPage"]').click().send_keys('abcd@gmail.com')
@@ -291,6 +323,27 @@ class orderPayment:
         self.driver.find_element_by_xpath('//div//input[@name="confirm_passwordRegisterPage"]').click().send_keys('Abcd1234')
         self.driver.find_element_by_xpath('//div//input[@name="i_agree"]').click()
         WebDriverWait(self.driver,10).until(EC.element_to_be_clickable(By.ID("register_btnundefined")))
+        self.driver.find_element_by_id("register_btnundefined").click()
+
+    #Create new payment method
+    def Payment_method(self):
+        self.driver.find_element_by_id("next_btn").click()
+        self.driver.find_element_by_xpath('//div//input[@name="username"]').click().send_keys('Abcd12')
+        self.driver.find_element_by_xpath('//div//input[@name="safepay_password"]').click().send_keys('Barg1234')
+        self.driver.find_element_by_id("pay_now_btn_SAFEPAY").click()
+
+    #Return the order id
+    def order_id(self):
+        return self.driver.find_element_by_id("orderNumberLabel").text()
+
+    #Creating new account and pament method
+    def Payment_process(self):
+        self.waitRegister()
+        self.Create_account()
+        self.waitAfterRegistration()
+        self.Payment_method()
+        self.waitAfterPayment()
+        return self.order_id()
 
 
 
