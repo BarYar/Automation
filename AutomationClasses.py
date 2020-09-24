@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import inspect
 import random
+import time
 #Login and Logout processes
 class Log:
     #Constructor
@@ -289,10 +290,14 @@ class orderPayment:
     def waitRegisterButton(self):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID, "registration_btnundefined")))
-    #Implicity wait- after registration
-    def waitAfterRegistration(self):
-        WebDriverWait(self.driver,10).until(
-            EC.visibility_of_element_located((By.ID,"orderPayment"))
+    #Implicity wait- Next button
+    def waitNextButton(self):
+        WebDriverWait(self.driver,20).until(
+            EC.visibility_of_element_located((By.ID,"next_btn"))
+        )
+    def waitAfterNextButton(self):
+        WebDriverWait(self.driver, 20).until(
+            EC.visibility_of_element_located((By.XPATH, "//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']"))
         )
     # Implicity wait- after Payment
     def waitAfterPayment(self):
@@ -301,10 +306,13 @@ class orderPayment:
         )
     #Implicity wait- register page
     def waitRegisterPage(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID,"registerPage")))
+
     #Click on the register button
     def registerButtonClick(self):
         self.waitRegisterButton()
-        self.driver.find_element_by_id("register_btnundefined").click()
+        self.driver.find_element_by_id("registration_btnundefined").click()
 
     #Create new random user
     def User_name(self):
@@ -319,31 +327,48 @@ class orderPayment:
 
     #Create new account
     def Create_account(self):
-        self.driver.find_element_by_xpath("//div//input[@name='usernameRegisterPage']").click().send_keys(self.User_name())
-        self.driver.find_element_by_xpath('//div//input[@name="emailRegisterPage"]').click().send_keys('abcd@gmail.com')
-        self.driver.find_element_by_xpath('//div//input[@name="passwordRegisterPage"]').click().send_keys('Abcd1234')
-        self.driver.find_element_by_xpath('//div//input[@name="confirm_passwordRegisterPage"]').click().send_keys('Abcd1234')
+        self.driver.find_element_by_xpath("//div//input[@name='usernameRegisterPage']").send_keys(self.User_name())
+        self.driver.find_element_by_xpath('//div//input[@name="emailRegisterPage"]').send_keys('abcd@gmail.com')
+        self.driver.find_element_by_xpath('//div//input[@name="passwordRegisterPage"]').send_keys('Ako123987')
+        self.driver.find_element_by_xpath('//div//input[@name="confirm_passwordRegisterPage"]').send_keys('Ako123987')
         self.driver.find_element_by_xpath('//div//input[@name="i_agree"]').click()
-        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable(By.ID("register_btnundefined")))
         self.driver.find_element_by_id("register_btnundefined").click()
 
     #Create new payment method
     def Payment_method(self):
         self.driver.find_element_by_id("next_btn").click()
-        self.driver.find_element_by_xpath('//div//input[@name="username"]').click().send_keys('Abcd12')
-        self.driver.find_element_by_xpath('//div//input[@name="safepay_password"]').click().send_keys('Barg1234')
+        self.waitAfterNextButton()
+        self.driver.find_element_by_xpath("//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']").click()
+        WebDriverWait(self.driver, 20).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//sec-view[@a-hint='SafePay username']//label[@class='animated']"))
+        )
+        self.driver.find_element_by_name("safepay_username").send_keys('Abcd12')
+
+
+        self.driver.find_element_by_xpath(
+            "//sec-view[@a-hint='SafePay password']//div[@class='inputContainer ng-scope']").click()
+        WebDriverWait(self.driver, 20).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//sec-view[@a-hint='SafePay password']//label[@class='animated']"))
+        )
+        self.driver.find_element_by_name("safepay_password").send_keys('Barg1234')
+
+
         self.driver.find_element_by_id("pay_now_btn_SAFEPAY").click()
+
 
     #Return the order id
     def order_id(self):
+        WebDriverWait(self.driver,5)
         return self.driver.find_element_by_id("orderNumberLabel").text()
 
     #Creating new account and pament method
     def paymentProcess(self):
         self.registerButtonClick()
-        self.waitAfterRegistration()
+        self.waitRegisterPage()
         self.Create_account()
-        self.waitAfterRegistration()
+        self.waitNextButton()
         self.Payment_method()
         self.waitAfterPayment()
         return self.order_id()

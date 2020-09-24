@@ -118,16 +118,8 @@ class TestAOS(TestCase):
         self.mpage.cartClick()
         shoppingc = shoppingCart(self.driver)
         shoppingc.checkOutButtonClick()
-        time.sleep(7)
         orderp = orderPayment(self.driver)
-        orderp.paymentProcess()
-
-
-
-
-
-
-
+        print(orderp.paymentProcess())
 
     #q10-Log in and Log out process
     def test10(self):
