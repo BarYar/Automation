@@ -11,6 +11,7 @@ def priceToFloat(price):
     if (len(price) == 8):
         price = price[:1] + price[2:]
     return float(price)
+import time
 #Login and Logout processes
 class Log:
     #Constructor
@@ -78,10 +79,16 @@ class MainPage:
         if (categoryname not in categorynames):
             raise ValueError("Invalid category name.")
         self.driver.find_element_by_id(f'{categoryname}Img').click()
+    #Implicity wait main page
     def implicityWaitMainPage(self):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID, "our_products"))
         )
+    #Returns to main page and wait for it to load
+    def backAndWait(self):
+        self.driver.back()
+        self.implicityWaitMainPage()
+
 
     """-----------------------------------------------------------------------------------------------------------------
                                         Cart in the top right functions
@@ -183,6 +190,13 @@ class categoryPage:
     def backAndWait(self):
         self.driver.back()
         self.implicityWaitCategoryPage()
+
+    #Check if the category title equals the givem title.
+    def categoryTitleEqual(self,title):
+        self.implicityWaitCategoryPage()
+        categoryname = self.driver.find_element_by_xpath('//h3[@class="categoryTitle roboto-regular sticky ng-binding"]').text
+        return title == categoryname #Return True or False
+
 #Product page class
 class productPage:
     #Constructor
@@ -267,28 +281,55 @@ class shoppingCart:
         price=priceToFloat(price)
         return price
     #Click on the check out button
-    def Cheack_out(self):
+    def checkOutButtonClick(self):
+        self.implicityWaitCartPage()
         self.driver.find_element_by_id("checkOutButton").click()
-        WebDriverWait(self.driver,10).until(
-            EC.visibility_of_element_located((By.ID , "orderPayment")))
     #Waiting until the page is up
     def implicityWaitCartPage(self):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//a[contains(text(),'SHOPPING CART')]"))
         )
+
     #Click on the edit button for the given location
     def editProduct(self,location):
         self.implicityWaitCartPage()
         editloc=self.driver.find_elements_by_xpath("//a[@class='edit ng-scope']")
         editloc[location].click()
-
+#Order Payment pages
 class orderPayment:
+    #Constructor
     def __init__(self,driver):
         self.driver=driver
-        WebDriverWait(self.driver , 10).until(
-            EC.visibility_of_element_located((By.ID , "form")))
         self.userNameList=[]
+    #Implicity wait- register button from shopping cart
+    def waitRegisterButton(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "registration_btnundefined")))
+    #Implicity wait- Next button
+    def waitNextButton(self):
+        WebDriverWait(self.driver,20).until(
+            EC.visibility_of_element_located((By.ID,"next_btn"))
+        )
+    def waitAfterNextButton(self):
+        WebDriverWait(self.driver, 20).until(
+            EC.visibility_of_element_located((By.XPATH, "//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']"))
+        )
+    # Implicity wait- after Payment
+    def waitAfterPayment(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID,"orderPaymentSuccess"))
+        )
+    #Implicity wait- register page
+    def waitRegisterPage(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID,"registerPage")))
 
+    #Click on the register button
+    def registerButtonClick(self):
+        self.waitRegisterButton()
+        self.driver.find_element_by_id("registration_btnundefined").click()
+
+    #Create new random user
     def User_name(self):
         self.st= 'kobi'
         num=random.randint(1,10000000)
@@ -299,13 +340,53 @@ class orderPayment:
             self.userNameList.append(self.st)
             return self.st
 
+    #Create new account
     def Create_account(self):
-        self.driver.find_element_by_xpath("//div//input[@name='usernameRegisterPage']").click().send_keys(self.User_name())
-        self.driver.find_element_by_xpath('//div//input[@name="emailRegisterPage"]').click().send_keys('abcd@gmail.com')
-        self.driver.find_element_by_xpath('//div//input[@name="passwordRegisterPage"]').click().send_keys('Abcd1234')
-        self.driver.find_element_by_xpath('//div//input[@name="confirm_passwordRegisterPage"]').click().send_keys('Abcd1234')
+        self.driver.find_element_by_xpath("//div//input[@name='usernameRegisterPage']").send_keys(self.User_name())
+        self.driver.find_element_by_xpath('//div//input[@name="emailRegisterPage"]').send_keys('abcd@gmail.com')
+        self.driver.find_element_by_xpath('//div//input[@name="passwordRegisterPage"]').send_keys('Ako123987')
+        self.driver.find_element_by_xpath('//div//input[@name="confirm_passwordRegisterPage"]').send_keys('Ako123987')
         self.driver.find_element_by_xpath('//div//input[@name="i_agree"]').click()
-        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable(By.ID("register_btnundefined")))
+        self.driver.find_element_by_id("register_btnundefined").click()
+
+    #Create new payment method
+    def Payment_method(self):
+        self.driver.find_element_by_id("next_btn").click()
+        self.waitAfterNextButton()
+        self.driver.find_element_by_xpath("//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']").click()
+        WebDriverWait(self.driver, 20).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//sec-view[@a-hint='SafePay username']//label[@class='animated']"))
+        )
+        self.driver.find_element_by_name("safepay_username").send_keys('Abcd12')
+
+
+        self.driver.find_element_by_xpath(
+            "//sec-view[@a-hint='SafePay password']//div[@class='inputContainer ng-scope']").click()
+        WebDriverWait(self.driver, 20).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//sec-view[@a-hint='SafePay password']//label[@class='animated']"))
+        )
+        self.driver.find_element_by_name("safepay_password").send_keys('Barg1234')
+
+
+        self.driver.find_element_by_id("pay_now_btn_SAFEPAY").click()
+
+
+    #Return the order id
+    def order_id(self):
+        WebDriverWait(self.driver,5)
+        return self.driver.find_element_by_id("orderNumberLabel").text()
+
+    #Creating new account and pament method
+    def paymentProcess(self):
+        self.registerButtonClick()
+        self.waitRegisterPage()
+        self.Create_account()
+        self.waitNextButton()
+        self.Payment_method()
+        self.waitAfterPayment()
+        return self.order_id()
 
 
 

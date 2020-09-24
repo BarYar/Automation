@@ -12,7 +12,7 @@ import logging
 class TestAOS(TestCase):
     #setUp
     def setUp(self):
-        path = r"C:\Chromedriver\chromedriver.exe"
+        path = r"C:\Users\97252\Desktop\Selenium\chromedriver.exe"
         self.driver = webdriver.Chrome(path)
         self.driver.get("https://www.advantageonlineshopping.com/#/")
         self.lCategory=['speakers','tablets','laptops','mice','headphones']
@@ -95,6 +95,32 @@ class TestAOS(TestCase):
         sum=round(sum,2)
         checkoutprice=round(checkoutprice,2)
         self.assertEqual(checkoutprice,sum)
+
+    def test7(self):
+        self.mpage.enterCategoryPage('tablets')
+        Ppage=productPage(self.driver)
+        cpage= categoryPage(self.driver)
+        cpage.openRandomProduct([])
+        Ppage.addNewProduct(1)
+        cpage.backAndWait()
+        self.assertTrue(cpage.categoryTitleEqual('TABLETS'))
+        self.mpage.backAndWait()
+
+    def test8(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ppage = productPage(self.driver)
+        ListOfLoc = []
+        for i in range(2):
+            cpage.openRandomProduct(ListOfLoc)
+            ppage.addNewProduct(3 - i)
+            cpage.backAndWait()
+        self.mpage.cartClick()
+        shoppingc = shoppingCart(self.driver)
+        shoppingc.checkOutButtonClick()
+        orderp = orderPayment(self.driver)
+        print(orderp.paymentProcess())
+
     #q6-Ordering 2 products, then change their quantity and check if it has been updated in the cart.
     def test6(self):
         self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
