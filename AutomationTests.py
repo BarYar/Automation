@@ -116,6 +116,11 @@ class TestAOS(TestCase):
             ppage.addNewProduct(3 - i)
             cpage.backAndWait()
         self.mpage.cartClick()
+        shoppingc = shoppingCart(self.driver)
+        shoppingc.checkOutButtonClick()
+        time.sleep(7)
+        orderp = orderPayment(self.driver)
+        orderp.paymentProcess()
 
 
 

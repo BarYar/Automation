@@ -271,10 +271,9 @@ class shoppingCart:
         price=float(price)
         return price
     #Click on the check out button
-    def Cheack_out(self):
+    def checkOutButtonClick(self):
+        self.implicityWaitCartPage()
         self.driver.find_element_by_id("checkOutButton").click()
-        WebDriverWait(self.driver,10).until(
-            EC.visibility_of_element_located((By.ID , "orderPayment")))
     #Waiting until the page is up
     def implicityWaitCartPage(self):
         WebDriverWait(self.driver, 10).until(
@@ -285,25 +284,28 @@ class orderPayment:
     #Constructor
     def __init__(self,driver):
         self.driver=driver
-        self.waitRegister()
         self.userNameList=[]
-
-    #Implicity wait- register from shopping cart
-    def waitRegister(self):
+    #Implicity wait- register button from shopping cart
+    def waitRegisterButton(self):
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, "form")))
-
+            EC.visibility_of_element_located((By.ID, "registration_btnundefined")))
     #Implicity wait- after registration
     def waitAfterRegistration(self):
         WebDriverWait(self.driver,10).until(
             EC.visibility_of_element_located((By.ID,"orderPayment"))
         )
-
     # Implicity wait- after Payment
     def waitAfterPayment(self):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID,"orderPaymentSuccess"))
         )
+    #Implicity wait- register page
+    def waitRegisterPage(self):
+    #Click on the register button
+    def registerButtonClick(self):
+        self.waitRegisterButton()
+        self.driver.find_element_by_id("register_btnundefined").click()
+
     #Create new random user
     def User_name(self):
         self.st= 'kobi'
@@ -337,8 +339,9 @@ class orderPayment:
         return self.driver.find_element_by_id("orderNumberLabel").text()
 
     #Creating new account and pament method
-    def Payment_process(self):
-        self.waitRegister()
+    def paymentProcess(self):
+        self.registerButtonClick()
+        self.waitAfterRegistration()
         self.Create_account()
         self.waitAfterRegistration()
         self.Payment_method()
