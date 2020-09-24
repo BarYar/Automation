@@ -5,6 +5,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import inspect
 import random
+#Converting the price from string to float.
+# Assuming that the most expensive product is max 9,999.99$
+def priceToFloat(price):
+    if (len(price) == 8):
+        price = price[:1] + price[2:]
+    return float(price)
 #Login and Logout processes
 class Log:
     #Constructor
@@ -105,9 +111,9 @@ class MainPage:
                         self.listOfProducts[i][j] = int(self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//label[@class="ng-binding"]').text.split()[1])
                     if(j==2):
                         price= self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//p[@class="price roboto-regular ng-binding"]').text[1:]
-                        if(len(price)==8):#Assuming that the most expensive product is max 9,999.99$
-                            price=price[:1]+price[2:]
-                        self.listOfProducts[i][j] =float(price)
+                        # if(len(price)==8):#Assuming that the most expensive product is max 9,999.99$
+                        #     price=price[:1]+price[2:]
+                        self.listOfProducts[i][j] =priceToFloat(price)
                     if(j == 3):
                         self.listOfProducts[i][j] = self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//span[@class="ng-binding"]').text
         return self.listOfProducts
@@ -164,6 +170,7 @@ class categoryPage:
         while (location in ListOfLoc):
             location = random.randint(0, len(products) - 1)
         ListOfLoc.append((location))
+        self.implicityWaitCategoryPage()
         products[location].click()
         ListOfLoc.append(location)
         return ListOfLoc
@@ -172,7 +179,7 @@ class categoryPage:
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//div[@class='cell categoryRight']"))
         )
-    #Click on the back button wand wait for the page to load/
+    #Click on the back button and wait for the page to load
     def backAndWait(self):
         self.driver.back()
         self.implicityWaitCategoryPage()
@@ -189,9 +196,7 @@ class productPage:
         productDetails=[0,0,0,0]
         productDetails[0]=self.driver.find_element_by_xpath("//h1[@class='roboto-regular screen768 ng-binding']").text
         price= self.driver.find_element_by_xpath("//h2[@class='roboto-thin screen768 ng-binding']").text[1:]
-        if (len(price) == 8):  # Assuming that the most expensive product is max 9,999.99$
-            price = price[:1] + price[2:]
-        productDetails[2] =float(price)
+        productDetails[2] =priceToFloat(price)
         productDetails[3] = self.driver.find_element_by_xpath("//span[contains(@class,'colorSelected')]").get_attribute('title')
         return productDetails
     #Set the quatity of the product to the given quantity
@@ -216,6 +221,15 @@ class productPage:
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID, "Description"))
         )
+    #Reducing the quantity
+    def reduceQuantity(self,amount):
+        self.implicityWaitProductPage()
+        for i in range(amount):
+            try:
+                self.driver.find_element_by_xpath("//div[@class='minus']").click()
+            except:
+                break
+        self.addToCart()
 #Shopping cart page class
 class shoppingCart:
     #Constructor
@@ -237,7 +251,6 @@ class shoppingCart:
     # Name[0], Quantity[1]=0-Cant Reach, Price[2], Color[3]
     def products_details(self):
         elements = self.elements_in_cart()
-        print(elements)
         self.product_list=[]
         for i in range (0,len(elements[0])):
             self.product_list.append([0,0,0,0])
@@ -245,17 +258,13 @@ class shoppingCart:
             self.product_list[i][0]=elements[0][i].text
             self.product_list[i][1] = elements[1][i].text
             price=elements[2][i].text[1:]
-            if (len(price) == 8):  # Assuming that the most expensive product is max 9,999.99$
-                price = price[:1] + price[2:]
-            self.product_list[i][2] =float(price)
+            self.product_list[i][2] =priceToFloat(price)
             self.product_list[i][3] = elements[3][i].get_attribute('title')
         return self.product_list
     #Return the check out price
     def checkOut(self):
         price=self.driver.find_element_by_xpath("//div[@id='shoppingCart']//span[@class='roboto-medium ng-binding']").text[1:]
-        if(len(price)==8):
-            price=price[:1]+price[2:]
-        price=float(price)
+        price=priceToFloat(price)
         return price
     #Click on the check out button
     def Cheack_out(self):
@@ -267,6 +276,12 @@ class shoppingCart:
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//a[contains(text(),'SHOPPING CART')]"))
         )
+    #Click on the edit button for the given location
+    def editProduct(self,location):
+        self.implicityWaitCartPage()
+        editloc=self.driver.find_elements_by_xpath("//a[@class='edit ng-scope']")
+        editloc[location].click()
+
 class orderPayment:
     def __init__(self,driver):
         self.driver=driver

@@ -12,7 +12,7 @@ import logging
 class TestAOS(TestCase):
     #setUp
     def setUp(self):
-        path = r"C:\Users\97252\Desktop\Selenium\chromedriver.exe"
+        path = r"C:\Chromedriver\chromedriver.exe"
         self.driver = webdriver.Chrome(path)
         self.driver.get("https://www.advantageonlineshopping.com/#/")
         self.lCategory=['speakers','tablets','laptops','mice','headphones']
@@ -95,6 +95,28 @@ class TestAOS(TestCase):
         sum=round(sum,2)
         checkoutprice=round(checkoutprice,2)
         self.assertEqual(checkoutprice,sum)
+    #q6-Ordering 2 products, then change their quantity and check if it has been updated in the cart.
+    def test6(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ListOfLoc = []
+        ppage = productPage(self.driver)
+        for i in range(2):
+            cpage.openRandomProduct(ListOfLoc)
+            ppage.addNewProduct(3)
+            cpage.backAndWait()
+        productsDetails=self.mpage.getProductDetails()
+        self.mpage.cartClick()
+        cartpage=shoppingCart(self.driver)
+        cartpage.editProduct(1)
+        ppage.reduceQuantity(1)
+        self.mpage.cartClick()
+        cartpage.editProduct(0)
+        ppage.reduceQuantity(1)
+        productsDetails[0][1]=2
+        productsDetails[1][1] = 2
+        self.assertTrue(self.mpage.cartCompare(productsDetails))
+
     #q10-Log in and Log out process
     def test10(self):
         log=Log(self.driver)
