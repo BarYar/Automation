@@ -142,9 +142,7 @@ class TestAOS(TestCase):
         shoppingc.checkOutButtonClick()
         orderp = orderPayment(self.driver)
         orderIdAfterPayment=orderp.paymentProcessSafePay()
-        self.mpage.returnToMainPage()
-        orderidOrders=User(self.driver).getLastOrderId()
-        self.assertEqual(orderidOrders,orderIdAfterPayment)
+
     #q9-Make an order, create new acoount, pay with credit card and check that the order id is in my orders section
     def test9(self):
         self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
