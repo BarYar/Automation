@@ -15,5 +15,5 @@ time.sleep(5)
 driver.get("https://www.w3schools.com/python/ref_func_map.asp")
 time.sleep(5)
 driver.back()
-driver.f
+driver.find_element_by_class_name(name)
 driver.find_element_by_xpath("aa").get_attribute('asd')

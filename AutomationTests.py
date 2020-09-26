@@ -10,7 +10,7 @@ import time
 from AutomationClasses import *
 import logging
 class TestAOS(TestCase):
-    #setUp
+    #Set up method
     def setUp(self):
         path = r"C:\Users\97252\Desktop\Selenium\chromedriver.exe"
         self.driver = webdriver.Chrome(path)
@@ -22,6 +22,7 @@ class TestAOS(TestCase):
         )
         self.mpage = MainPage(self.driver)
         self.categorynum = random.randint(0, 4)
+    #Tear down method
     def tearDown(self):
         self.driver.find_element_by_class_name("logo").click()
         self.driver.quit()
@@ -95,32 +96,6 @@ class TestAOS(TestCase):
         sum=round(sum,2)
         checkoutprice=round(checkoutprice,2)
         self.assertEqual(checkoutprice,sum)
-
-    def test7(self):
-        self.mpage.enterCategoryPage('tablets')
-        Ppage=productPage(self.driver)
-        cpage= categoryPage(self.driver)
-        cpage.openRandomProduct([])
-        Ppage.addNewProduct(1)
-        cpage.backAndWait()
-        self.assertTrue(cpage.categoryTitleEqual('TABLETS'))
-        self.mpage.backAndWait()
-
-    def test8(self):
-        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
-        cpage = categoryPage(self.driver)
-        ppage = productPage(self.driver)
-        ListOfLoc = []
-        for i in range(2):
-            cpage.openRandomProduct(ListOfLoc)
-            ppage.addNewProduct(3 - i)
-            cpage.backAndWait()
-        self.mpage.cartClick()
-        shoppingc = shoppingCart(self.driver)
-        shoppingc.checkOutButtonClick()
-        orderp = orderPayment(self.driver)
-        print(orderp.paymentProcess())
-
     #q6-Ordering 2 products, then change their quantity and check if it has been updated in the cart.
     def test6(self):
         self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
@@ -142,12 +117,56 @@ class TestAOS(TestCase):
         productsDetails[0][1]=2
         productsDetails[1][1] = 2
         self.assertTrue(self.mpage.cartCompare(productsDetails))
-
+    #q7-Order a tablet, then return to tablets category and to main page
+    def test7(self):
+        self.mpage.enterCategoryPage('tablets')
+        Ppage=productPage(self.driver)
+        cpage= categoryPage(self.driver)
+        cpage.openRandomProduct([])
+        Ppage.addNewProduct(1)
+        cpage.backAndWait()
+        self.assertTrue(cpage.categoryTitleEqual('TABLETS'))
+        self.mpage.returnToMainPage()
+    #q8-Make an order, create new acoount, pay with SafePay and check that the order id is in my orders section
+    def test8(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ppage = productPage(self.driver)
+        ListOfLoc = []
+        for i in range(2):
+            cpage.openRandomProduct(ListOfLoc)
+            ppage.addNewProduct(3 - i)
+            cpage.backAndWait()
+        self.mpage.cartClick()
+        shoppingc = shoppingCart(self.driver)
+        shoppingc.checkOutButtonClick()
+        orderp = orderPayment(self.driver)
+        orderIdAfterPayment=orderp.paymentProcessSafePay()
+        self.mpage.returnToMainPage()
+        orderidOrders=User(self.driver).getLastOrderId()
+        self.assertEqual(orderidOrders,orderIdAfterPayment)
+    #q9-Make an order, create new acoount, pay with credit card and check that the order id is in my orders section
+    def test9(self):
+        self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
+        cpage = categoryPage(self.driver)
+        ppage = productPage(self.driver)
+        ListOfLoc = []
+        for i in range(2):
+            cpage.openRandomProduct(ListOfLoc)
+            ppage.addNewProduct(3 - i)
+            cpage.backAndWait()
+        self.mpage.cartClick()
+        shoppingc = shoppingCart(self.driver)
+        shoppingc.checkOutButtonClick()
+        orderp = orderPayment(self.driver)
+        orderIdAfterPayment=orderp.paymentProcessMasterCredit()
+        self.mpage.returnToMainPage()
+        orderidOrders=User(self.driver).getLastOrderId()
+        self.assertEqual(orderidOrders,orderIdAfterPayment)
     #q10-Log in and Log out process
     def test10(self):
-        log=Log(self.driver)
-        log.LogInDetails('experis123','Experis123')
-        log.LogIn()
+        log=User(self.driver)
+        log.LogIn('experis123','Experis123')
         log.LogOut()
 
 if __name__=="__main__":
@@ -244,3 +263,7 @@ if __name__=="__main__":
     #     for i in enteredProducts:
     #         self.assertTrue(i in cartProducts)
     #         self.assertTrue(enteredProducts[i] == cartProducts[i])
+    #test8 finale
+    # self.mpage.returnToMainPage()
+    # orderidOrders = User(self.driver).getLastOrderId()
+    # self.assertEqual(orderidOrders, orderIdAfterPayment)
