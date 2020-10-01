@@ -65,8 +65,6 @@ class MainPage:
                         self.listOfProducts[i][j] = int(self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//label[@class="ng-binding"]').text.split()[1])
                     if(j==2):
                         price= self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//p[@class="price roboto-regular ng-binding"]').text[1:]
-                        # if(len(price)==8):#Assuming that the most expensive product is max 9,999.99$
-                        #     price=price[:1]+price[2:]
                         self.listOfProducts[i][j] =priceToFloat(price)
                     if(j == 3):
                         self.listOfProducts[i][j] = self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//span[@class="ng-binding"]').text
@@ -411,17 +409,14 @@ class orderPayment:
     def PaymentSafePay(self):
         self.driver.find_element_by_id("next_btn").click()
         self.waitAfterNextButton()
-        self.driver.find_element_by_xpath("//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']").click()
+        self.driver.find_element_by_xpath(
+            "//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']").click()
         WebDriverWait(self.driver, 20).until(
-            EC.presence_of_element_located(
-                (By.XPATH, "//sec-view[@a-hint='SafePay username']//label[@class='animated']"))
-        )
+            EC.presence_of_element_located((By.XPATH, "//sec-view[@a-hint='SafePay username']//label[@class='animated']")))
         self.driver.find_element_by_name("safepay_username").send_keys('Abcd12')
         self.driver.find_element_by_xpath("//sec-view[@a-hint='SafePay password']//div[@class='inputContainer ng-scope']").click()
         WebDriverWait(self.driver, 20).until(
-            EC.presence_of_element_located(
-                (By.XPATH, "//sec-view[@a-hint='SafePay password']//label[@class='animated']"))
-        )
+            EC.presence_of_element_located((By.XPATH, "//sec-view[@a-hint='SafePay password']//label[@class='animated']")))
         self.driver.find_element_by_name("safepay_password").send_keys('Barg1234')
         self.driver.find_element_by_id("pay_now_btn_SAFEPAY").click()
     # Create new payment method
