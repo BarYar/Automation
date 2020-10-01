@@ -9,8 +9,9 @@ from selenium.webdriver.common.action_chains  import ActionChains
 #Converting the price from string to float.
 # Assuming that the most expensive product is max 9,999.99$
 def priceToFloat(price):
-    if (len(price) == 8):
-        price = price[:1] + price[2:]
+    price=price.replace(',','')
+    price=price.replace('$', '')
+    print(price)
     return float(price)
 import time
 #Main page class
@@ -64,7 +65,7 @@ class MainPage:
                     if(j==1):
                         self.listOfProducts[i][j] = int(self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//label[@class="ng-binding"]').text.split()[1])
                     if(j==2):
-                        price= self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//p[@class="price roboto-regular ng-binding"]').text[1:]
+                        price= self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//p[@class="price roboto-regular ng-binding"]').text
                         self.listOfProducts[i][j] =priceToFloat(price)
                     if(j == 3):
                         self.listOfProducts[i][j] = self.driver.find_element_by_xpath(f'//li//table[@ng-show="cart.productsInCart.length > 0"]//tr[{i+1}]//span[@class="ng-binding"]').text
@@ -253,7 +254,7 @@ class productPage:
     def getProductDetails(self):
         productDetails=[0,0,0,0]
         productDetails[0]=self.driver.find_element_by_xpath("//h1[@class='roboto-regular screen768 ng-binding']").text
-        price= self.driver.find_element_by_xpath("//h2[@class='roboto-thin screen768 ng-binding']").text[1:]
+        price= self.driver.find_element_by_xpath("//h2[@class='roboto-thin screen768 ng-binding']").text
         productDetails[2] =priceToFloat(price)
         productDetails[3] = self.driver.find_element_by_xpath("//span[contains(@class,'colorSelected')]").get_attribute('title')
         return productDetails
@@ -315,13 +316,13 @@ class shoppingCart:
         for i in range (0,len(elements[0])):
             self.product_list[i][0]=elements[0][i].text
             self.product_list[i][1] = elements[1][i].text
-            price=elements[2][i].text[1:]
+            price=elements[2][i].text
             self.product_list[i][2] =priceToFloat(price)
             self.product_list[i][3] = elements[3][i].get_attribute('title')
         return self.product_list
     #Return the check out price
     def checkOut(self):
-        price=self.driver.find_element_by_xpath("//div[@id='shoppingCart']//span[@class='roboto-medium ng-binding']").text[1:]
+        price=self.driver.find_element_by_xpath("//div[@id='shoppingCart']//span[@class='roboto-medium ng-binding']").text
         price=priceToFloat(price)
         return price
     #Click on the check out button
@@ -401,10 +402,14 @@ class orderPayment:
         while (self.waitRegisterButtonToBeClickAble()==False):#Flaky button
             self.driver.find_element_by_name('i_agree').click()
         self.driver.find_element_by_id("register_btnundefined").click()
-        try:
-            self.waitRegisterPage()#Flaky button
-        except:
-            self.driver.find_element_by_id("register_btnundefined").click()
+        enteredRegisterPage=False
+        while(enteredRegisterPage==False):
+            try:
+                self.waitRegisterPage()#Flaky button
+            except:
+                self.driver.find_element_by_id("register_btnundefined").click()
+            else:
+                enteredRegisterPage = True
     #Create new payment method
     def PaymentSafePay(self):
         self.driver.find_element_by_id("next_btn").click()
