@@ -164,7 +164,7 @@ class TestAOS(TestCase):
     #q10-Log in and Log out process
     def test10(self):
         log=User(self.driver)
-        log.LogIn('experis123','Experis123')
+        log.LogIn('By1zx','Cb12')
         log.LogOut()
 
 if __name__=="__main__":
