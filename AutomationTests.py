@@ -99,6 +99,7 @@ class TestAOS(TestCase):
             logFails(4)
             self.fail()
     #q5-Ordering 3 products, check if the total price of the products matches the checkout price.
+    #In addition, you need to print each product details
     def test5(self):
         try:
             self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
@@ -111,6 +112,9 @@ class TestAOS(TestCase):
                 cpage.openRandomProduct(ListOfLoc)
                 productsDetails.append(ppage.addNewProduct(3 - i))
                 sum=sum+productsDetails[i][2]
+                if(i==0):
+                    print("The products details are:")
+                ppage.printProductDetails()
                 cpage.backAndWait()
             shoppingc = shoppingCart(self.driver)
             self.mpage.cartClick()

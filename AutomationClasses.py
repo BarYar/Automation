@@ -252,12 +252,12 @@ class productPage:
     # in each cell in the list- the prodcut details order by:
     # Name[0], Quantity[1]=0-Cant Reach, Price[2], Color[3]
     def getProductDetails(self):
-        productDetails=[0,0,0,0]
-        productDetails[0]=self.driver.find_element_by_xpath("//h1[@class='roboto-regular screen768 ng-binding']").text
+        self.productDetails=[0,0,0,0]
+        self.productDetails[0]=self.driver.find_element_by_xpath("//h1[@class='roboto-regular screen768 ng-binding']").text
         price= self.driver.find_element_by_xpath("//h2[@class='roboto-thin screen768 ng-binding']").text
-        productDetails[2] =priceToFloat(price)
-        productDetails[3] = self.driver.find_element_by_xpath("//span[contains(@class,'colorSelected')]").get_attribute('title')
-        return productDetails
+        self.productDetails[2] =priceToFloat(price)
+        self.productDetails[3] = self.driver.find_element_by_xpath("//span[contains(@class,'colorSelected')]").get_attribute('title')
+        return self.productDetails
     #Set the quatity of the product to the given quantity
     def addQuantity(self,quantity):
         for i in range(quantity-1):
@@ -275,6 +275,17 @@ class productPage:
         details[2]=round(details[2]*quantity,2)
         self.addToCart()
         return details
+    #Prints product details
+    def printProductDetails(self):
+        for j in range(4):
+            if (j == 0):
+                print(f'Name {self.productDetails[j]}', end="   ")
+            if (j == 1):
+                print(f'Quantity {self.productDetails[j]}', end="   ")
+            if (j == 2):
+                print(f'Price {self.productDetails[j]}', end="   ")
+            if (j == 3):
+                print(f'Color {self.productDetails[j]}')
     #Wait for the page to load.
     def implicityWaitProductPage(self):
         WebDriverWait(self.driver, 10).until(
