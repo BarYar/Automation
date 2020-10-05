@@ -11,7 +11,6 @@ from selenium.webdriver.common.action_chains  import ActionChains
 def priceToFloat(price):
     price=price.replace(',','')
     price=price.replace('$', '')
-    print(price)
     return float(price)
 import time
 #Main page class
@@ -115,7 +114,7 @@ class User:
     #Constructor
     def __init__(self,driver):
         self.driver=driver
-        self.implicityWaitMainPage()
+        #self.implicityWaitMainPage()
 
     """-----------------------------------------------------------------------------------------------------------------
                                         Log In/Out functions
@@ -199,7 +198,8 @@ class User:
         )
     #Returns the last order ID
     def __returnLastOrderId(self):
-        return self.driver.find_element_by_xpath("//table//tr[@class='ng-scope']//td[1]").text
+        elements=self.driver.find_elements_by_xpath("//tr[@data-ng-repeat-start='order in myOrdersCtrl.orders track by $index']")
+        return elements[len(elements)-1].text.split()[0]
     #Method that returns the last order id
     #This method does the full process
     def getLastOrderId(self):
@@ -272,7 +272,7 @@ class productPage:
         self.addQuantity(quantity)
         details=self.getProductDetails()
         details[1]=quantity
-        details[2]=details[2]*quantity
+        details[2]=round(details[2]*quantity,2)
         self.addToCart()
         return details
     #Wait for the page to load.
@@ -366,12 +366,12 @@ class orderPayment:
     def waitNextButton(self):
         WebDriverWait(self.driver,20).until(
             EC.visibility_of_element_located((By.ID,"next_btn")))
-    #4a(optional) Implicity wait after clicking on the MasterCard button
-    def waitMasterCreditButton(self):
+    #5a(optional) Implicity wait after clicking on the next button-masterCredit
+    def waitAfterNextButtonMasterCredit(self):
         WebDriverWait(self.driver,20).until(
-            EC.visibility_of_element_located((By.ID,"creditCard")))
-    #5-Implicity wait-After clicking on the Next button
-    def waitAfterNextButton(self):
+            EC.visibility_of_element_located((By.ID,"paymentMethod")))
+    #5b-Implicity wait-After clicking on the Next button
+    def waitAfterNextButtonSafePay(self):
         WebDriverWait(self.driver, 20).until(
             EC.visibility_of_element_located((By.XPATH, "//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']")))
     #6-Implicity wait-after Payment
@@ -413,7 +413,7 @@ class orderPayment:
     #Create new payment method
     def PaymentSafePay(self):
         self.driver.find_element_by_id("next_btn").click()
-        self.waitAfterNextButton()
+        self.waitAfterNextButtonSafePay()
         self.driver.find_element_by_xpath(
             "//sec-view[@a-hint='SafePay username']//div[@class='inputContainer ng-scope']").click()
         WebDriverWait(self.driver, 20).until(
@@ -427,13 +427,13 @@ class orderPayment:
     # Create new payment method
     def PaymentMasterCredit(self):
         self.driver.find_element_by_id("next_btn").click()
-        self.waitAfterNextButton()
-        self.driver.find_element_by_name("masterCredit").click()
-        self.waitMasterCreditButton()
-        self.driver.find_element_by_id("creditCard").send_keys('123456789102')
-        self.driver.find_element_by_name("cvv_number").send_keys("123")
-        self.driver.find_element_by_name("cardholder_name").send_keys('BB YY')
-        self.driver.find_element_by_id("pay_now_btn_ManualPayment").click()
+        self.waitAfterNextButtonMasterCredit()
+        self.driver.find_element_by_id("pay_now_btn_MasterCredit").click()
+        # self.waitMasterCreditButton()
+        # self.driver.find_element_by_id("creditCard").send_keys('123456789102')
+        # self.driver.find_element_by_name("cvv_number").send_keys("1123")
+        # self.driver.find_element_by_name("cardholder_name").send_keys('BB YY')
+        # self.driver.find_element_by_id("pay_now_btn_ManualPayment").click()
     #Return the order id
     def order_id(self):
         WebDriverWait(self.driver,5)
@@ -450,8 +450,9 @@ class orderPayment:
         self.PaymentSafePay()
         self.waitAfterPayment()
         return self.order_id()
+    #The full process of the masterCredit payment
     def paymentProcessMasterCredit(self):
-        self.createAccountProcess()
+        self.waitNextButton()
         self.PaymentMasterCredit()
         self.waitAfterPayment()
         return self.order_id()
