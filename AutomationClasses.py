@@ -7,7 +7,6 @@ import inspect
 import random
 from selenium.webdriver.common.action_chains  import ActionChains
 #Converting the price from string to float.
-# Assuming that the most expensive product is max 9,999.99$
 def priceToFloat(price):
     price=price.replace(',','')
     price=price.replace('$', '')
@@ -29,8 +28,7 @@ class MainPage:
     #Implicity wait main page
     def implicityWaitMainPage(self):
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, "our_products"))
-        )
+            EC.visibility_of_element_located((By.ID, "our_products")))
     #Returns to main page
     def returnToMainPage(self):
         self.driver.find_element_by_class_name("logo").click()
@@ -87,8 +85,7 @@ class MainPage:
     #Waiting until the cart in the top right is opened
     def cartWait(self):
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//li//table[@ng-show='cart.productsInCart.length > 0']"))
-        )
+            EC.visibility_of_element_located((By.XPATH, "//li//table[@ng-show='cart.productsInCart.length > 0']")))
     #clicking the Cart Icon
     def cartClick(self):
         self.driver.find_element_by_id("menuCart").click()
@@ -114,7 +111,6 @@ class User:
     #Constructor
     def __init__(self,driver):
         self.driver=driver
-        #self.implicityWaitMainPage()
 
     """-----------------------------------------------------------------------------------------------------------------
                                         Log In/Out functions
@@ -170,23 +166,22 @@ class User:
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//label[@ng-click='signOut($event)']"))
         )
-
-    """-----------------------------------------------------------------------------------------------------------------
-                                        Orders functions
-    --------------------------------------------------------------------------------------------------------------------"""
-    #Click on the sign out button, wait for the sign out
+    # Click on the sign out button, wait for the sign out
     def signOutClick(self):
         self.driver.find_element_by_xpath("//label[@ng-click='signOut($event)']").click()
     # Implicity wait after signing in
     def waitSignOut(self):
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//span[@class='hi-user containMiniTitle ng-binding ng-hide']"))
-        )
+            EC.presence_of_element_located((By.XPATH, "//span[@class='hi-user containMiniTitle ng-binding ng-hide']")))
+
+
+    """-----------------------------------------------------------------------------------------------------------------
+                                        Orders functions
+    --------------------------------------------------------------------------------------------------------------------"""
     #Implicity wait when you are logged in
     def waitAlreadyConnected(self):
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//header//*[@id='loginMiniTitle']"))
-        )
+            EC.visibility_of_element_located((By.XPATH, "//header//*[@id='loginMiniTitle']")))
     #Clicking on the my orders button
     def clickMyOrders(self):
         self.driver.find_element_by_xpath("// header // * [ @ translate = 'My_Orders']").click()
@@ -194,8 +189,7 @@ class User:
     #Implicity wait for my orders window
     def waitOrders(self):
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, "myAccountContainer"))
-        )
+            EC.visibility_of_element_located((By.ID, "myAccountContainer")))
     #Returns the last order ID
     def __returnLastOrderId(self):
         elements=self.driver.find_elements_by_xpath("//tr[@data-ng-repeat-start='order in myOrdersCtrl.orders track by $index']")
@@ -224,7 +218,6 @@ class categoryPage:
         ListOfLoc.append((location))
         self.implicityWaitCategoryPage()
         products[location].click()
-        ListOfLoc.append(location)
         return ListOfLoc
     # Wait for the page to load.
     def implicityWaitCategoryPage(self):
@@ -276,6 +269,7 @@ class productPage:
         self.addToCart()
         return details
     #Prints product details
+    #Will not print the full details if the add new product function has'nt been executed.
     def printProductDetails(self):
         for j in range(4):
             if (j == 0):
@@ -289,8 +283,7 @@ class productPage:
     #Wait for the page to load.
     def implicityWaitProductPage(self):
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, "Description"))
-        )
+            EC.visibility_of_element_located((By.ID, "Description")))
     #Reducing the quantity
     def reduceQuantity(self,amount):
         self.implicityWaitProductPage()

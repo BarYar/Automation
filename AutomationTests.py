@@ -30,14 +30,12 @@ class TestAOS(TestCase):
             self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
             cpage = categoryPage(self.driver)
             ListOfLoc=[]
-            cpage.openRandomProduct(ListOfLoc)
             ppage = productPage(self.driver)
-            ppage.addNewProduct(3)
-            cpage.backAndWait()
-            cpage.openRandomProduct(ListOfLoc)
-            ppage.addNewProduct(2)
-            mpage=MainPage(self.driver)
-            self.assertTrue(int(mpage.cartAmount())==5)
+            for i in range(2):
+                cpage.openRandomProduct(ListOfLoc)
+                ppage.addNewProduct(3 - i)
+                cpage.backAndWait()
+            self.assertTrue(int(self.mpage.cartAmount())==5)
             logTest("INFO", 1)
         except:
             logTest("ERROR", 1)
@@ -186,7 +184,7 @@ class TestAOS(TestCase):
             shoppingc = shoppingCart(self.driver)
             shoppingc.checkOutButtonClick()
             orderp = orderPayment(self.driver)
-            orderIdAfterPayment=orderp.paymentProcessSafePay()
+            orderIdAfterPayment = orderp.paymentProcessSafePay()
             self.mpage.returnToMainPage()
             orderidOrders = User(self.driver).getLastOrderId()
             self.assertEqual(orderidOrders, orderIdAfterPayment)
