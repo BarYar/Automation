@@ -82,14 +82,14 @@ class MainPage:
                     if (self.listOfProducts[i][j] != products[i][j]):
                         return False
         return True
-    #Waiting until the cart in the top right is opened
+    #Waiting until the cart in the top right is open
     def cartWait(self):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//li//table[@ng-show='cart.productsInCart.length > 0']")))
-    #clicking the Cart Icon
+    #Clicking the Cart Icon
     def cartClick(self):
         self.driver.find_element_by_id("menuCart").click()
-    #Removing products from the cart
+    #Removing product from the cart
     def cartRemove(self,location=0):
         listOfProducts=self.getProductDetails()
         self.driver.find_elements_by_xpath("//div[@class='removeProduct iconCss iconX']")[location].click()
@@ -433,11 +433,6 @@ class orderPayment:
         self.driver.find_element_by_id("next_btn").click()
         self.waitAfterNextButtonMasterCredit()
         self.driver.find_element_by_id("pay_now_btn_MasterCredit").click()
-        # self.waitMasterCreditButton()
-        # self.driver.find_element_by_id("creditCard").send_keys('123456789102')
-        # self.driver.find_element_by_name("cvv_number").send_keys("1123")
-        # self.driver.find_element_by_name("cardholder_name").send_keys('BB YY')
-        # self.driver.find_element_by_id("pay_now_btn_ManualPayment").click()
     #Return the order id
     def order_id(self):
         WebDriverWait(self.driver,5)

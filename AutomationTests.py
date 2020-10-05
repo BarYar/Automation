@@ -41,7 +41,7 @@ class TestAOS(TestCase):
             logTest("ERROR", 1)
             logFails(1)
             self.fail()
-    #q2-Ordering 3 prodcuts,check if their details in the car are right.
+    #q2-Ordering 3 prodcuts,check if their details in the cart are right.
     def test2(self):
         try:
             self.mpage.enterCategoryPage(self.lCategory[self.categorynum])
@@ -145,7 +145,7 @@ class TestAOS(TestCase):
             self.mpage.cartClick()
             cartpage.editProduct(1)
             ppage.reduceQuantity(1)
-            productsDetails[0][1]=2
+            productsDetails[0][1] = 2
             productsDetails[1][1] = 2
             self.assertTrue(self.mpage.cartCompare(productsDetails))
             logTest("INFO", 6)
@@ -211,7 +211,7 @@ class TestAOS(TestCase):
             log = User(self.driver)
             log.LogIn('By123','Cer1')
             orderp = orderPayment(self.driver)
-            orderIdAfterPayment=orderp.paymentProcessMasterCredit()
+            orderIdAfterPayment = orderp.paymentProcessMasterCredit()
             self.mpage.returnToMainPage()
             orderidOrders=User(self.driver).getLastOrderId()
             self.assertEqual(orderidOrders,orderIdAfterPayment)
